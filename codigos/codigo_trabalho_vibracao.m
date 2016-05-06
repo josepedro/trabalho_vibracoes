@@ -53,7 +53,7 @@ frequencias_naturais = diag(omega_n)/(2*pi);
 % Calculo dos fatores de amortecimento modais
 fatores_amortecimento_modais = (alpha_proporcional + omega_n_quadrado*beta_proporcional)./(2*omega_n);
 fatores_amortecimento_modais = diag(fatores_amortecimento_modais);
-
+% xiri
 
 
 
