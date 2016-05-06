@@ -54,8 +54,15 @@ frequencias_naturais = diag(omega_n)/(2*pi);
 fatores_amortecimento_modais = (alpha_proporcional + omega_n_quadrado*beta_proporcional)./(2*omega_n);
 fatores_amortecimento_modais = diag(fatores_amortecimento_modais);
 
-
-
-
+% Construindo a forca de excitacao
+delta_frequencia = 0.1;
+tempo_total_excitacao = 1/delta_frequencia; % unidade em segundos
+frequencia_amostragem = 44100; % 44100 amostras por segundo
+frequencias_excitacao = [10:delta_frequencia:250]; % Hz
+delta_tempo = 1/frequencia_amostragem;
+tempos = [0:delta_tempo:tempo_total_excitacao];
+forca_excitacao = sin(250*2*pi*tempos);
+frequencias_ = (0:length(forca_excitacao)-1)*frequencia_amostragem/length(forca_excitacao); 
+plot(frequencias_, abs(fft(forca_excitacao)));
 
 
