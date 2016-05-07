@@ -1,6 +1,7 @@
 % CODIGO TRABALHO DE VIBRACOES
 clc; clear('all'); close all;
 
+numero_graus_liberdade = 4;
 % Declaracao das propriedades dos elementos:
 % massas:
 m_1 = 40; % unidade em Kg
@@ -21,8 +22,8 @@ c_1 = 360; % unidade em N.s/m
 c_3 = c_1;
 c_2 = 120; % unidade em N.s/m
 % constantes de amortecimento proporcional:
-alpha_proporcional = 0.1;
-beta_proporcional = 0.1;
+alpha_proporcional = 0.00001;
+beta_proporcional = 0.00002;
 
 
 % Construindo a matriz de massas
@@ -52,7 +53,7 @@ omega_n = omega_n_quadrado.^0.5;
 frequencias_naturais = diag(omega_n)/(2*pi);
 
 % Calculo dos fatores de amortecimento modais
-fatores_amortecimento_modais = (alpha_proporcional + omega_n_quadrado*beta_proporcional)./(2*omega_n);
+fatores_amortecimento_modais = (alpha_proporcional + omega_n_quadrado*beta_proporcional)/(2*omega_n);
 fatores_amortecimento_modais = diag(fatores_amortecimento_modais);
 
 % Construindo a forca de excitacao
@@ -78,3 +79,21 @@ axis([0 (frequencia_amostragem/2) min(abs(fft(forca_excitacao))) ...
 	max(abs(fft(forca_excitacao)) + 0.1*abs(fft(forca_excitacao)))]);
 
 
+% Construindo resposta em frequencia (H)
+omegas = 2*pi*frequencias_;
+omegas_quadrado = omegas.^2;
+H(numero_graus_liberdade, numero_graus_liberdade, length(omegas)) = 0;
+for omega = 1:length(omegas)
+	H(:,:,omega) = modos_vibracao* ... 
+	(1./(omega_n_quadrado - omegas(omega).^2 + ... 
+		i*2*diag(fatores_amortecimento_modais)*omega_n*omegas(omega)))*modos_vibracao';
+end
+
+cara(1:length(omegas)) = 0; 
+for n = 1:length(omegas)
+	cara(n) = abs(H(2,2,n));
+end
+
+
+
+semilogy(frequencias_, cara)
