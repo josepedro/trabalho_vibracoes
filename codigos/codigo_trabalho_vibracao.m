@@ -1,4 +1,5 @@
 % CODIGO TRABALHO DE VIBRACOES
+clc; clear('all'); close all;
 
 % Declaracao das propriedades dos elementos:
 % massas:
@@ -47,15 +48,33 @@ C(4,1:4) = [0, -c_6, -c_5, (c_8 + c_6 + c_5)];
 
 % Extracao dos autovalores (frequencias naturais) e autovetores (modos de vibracao)
 [modos_vibracao, omega_n_quadrado] = eig(K,M);
-omega_n = omega_naturais_quadrado.^0.5;
+omega_n = omega_n_quadrado.^0.5;
 frequencias_naturais = diag(omega_n)/(2*pi);
 
 % Calculo dos fatores de amortecimento modais
 fatores_amortecimento_modais = (alpha_proporcional + omega_n_quadrado*beta_proporcional)./(2*omega_n);
 fatores_amortecimento_modais = diag(fatores_amortecimento_modais);
-% xiri
 
-
-
+% Construindo a forca de excitacao
+delta_frequencia = 0.1;
+tempo_total_excitacao = 1/delta_frequencia; % unidade em segundos
+frequencia_amostragem = 44100/44; % 44100 amostras por segundo
+frequencias_excitacao = [10:delta_frequencia:250]; % Hz
+delta_tempo = 1/frequencia_amostragem;
+tempos = [0:delta_tempo:tempo_total_excitacao];
+forca_excitacao = 0;
+% Realizando o somatorio das forcas
+for frequencia = 1:length(frequencias_excitacao)
+	forca_excitacao = forca_excitacao + sin(frequencias_excitacao(frequencia)*2*pi*tempos);
+end
+% Plotando a banda de frequencia de excitacao da forca
+frequencias_ = (0:length(forca_excitacao)-1)*frequencia_amostragem/length(forca_excitacao); 
+figure(1);
+plot(frequencias_, abs(fft(forca_excitacao)));
+title('Espectro de Frequencias da Forca de Excitacao','Interpreter','latex','FontSize',16);
+xlabel('Frquencias [Hz]','Interpreter','latex','FontSize',16); 
+ylabel('Amplitude','Interpreter','latex','FontSize',16);
+axis([0 (frequencia_amostragem/2) min(abs(fft(forca_excitacao))) ... 
+	max(abs(fft(forca_excitacao)) + 0.1*abs(fft(forca_excitacao)))]);
 
 
