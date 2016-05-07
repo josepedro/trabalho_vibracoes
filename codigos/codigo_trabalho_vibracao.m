@@ -22,9 +22,8 @@ c_1 = 360; % unidade em N.s/m
 c_3 = c_1;
 c_2 = 120; % unidade em N.s/m
 % constantes de amortecimento proporcional:
-alpha_proporcional = 0.00001;
-beta_proporcional = 0.00002;
-
+alpha_proporcional = 0.00001; beta_proporcional = 0.00002;
+%alpha_proporcional = 0; beta_proporcional = 0;
 
 % Construindo a matriz de massas
 M = [m_1 0 0 0; 0 m_2 0 0; 0 0 m_3 0; 0 0 0 m_4];
@@ -89,11 +88,42 @@ for omega = 1:length(omegas)
 		i*2*diag(fatores_amortecimento_modais)*omega_n*omegas(omega)))*modos_vibracao';
 end
 
-cara(1:length(omegas)) = 0; 
-for n = 1:length(omegas)
-	cara(n) = abs(H(2,2,n));
+H_sem_amortecimento(numero_graus_liberdade, numero_graus_liberdade, length(omegas)) = 0;
+for omega = 1:length(omegas)
+	H_sem_amortecimento(:,:,omega) = modos_vibracao* ... 
+	(1./(omega_n_quadrado - omegas(omega).^2))*modos_vibracao';
 end
 
+% Extraindo a resposta em 2 e excitação em 2
+local_aplicacao_forca = 2;
+local_captacao_resposta = 2;
+H_22(1:length(omegas)) = 0;
+H_22_sem_amortecimento(1:length(omegas)) = 0; 
+for n = 1:length(omegas)
+	H_22(n) = abs(H(local_captacao_resposta,local_aplicacao_forca,n));
+	H_22_sem_amortecimento(n) = abs(H_sem_amortecimento(2,2,n)); 
+end
+
+figure;
+semilogy(frequencias_, H_22, 'black');
+set(findobj(gca,'type','line'), 'LineWidth', 3);
+hold on;
+semilogy(frequencias_, H_22_sem_amortecimento, 'blue');
+axis([0 250 0 0.0001])
 
 
-semilogy(frequencias_, cara)
+% Extraindo a resposta em 4 e excitação em 2
+H_42(1:length(omegas)) = 0;
+H_42_sem_amortecimento(1:length(omegas)) = 0;
+for n = 1:length(omegas)
+	H_42(n) = abs(H(4,local_aplicacao_forca,n));
+	H_42_sem_amortecimento(n) = abs(H_sem_amortecimento(4,2,n));
+end
+
+figure;
+semilogy(frequencias_, H_42, 'black');
+set(findobj(gca,'type','line'), 'LineWidth', 3);
+hold on;
+semilogy(frequencias_, H_42_sem_amortecimento, 'blue');
+axis([0 250 0 0.0001])
+
