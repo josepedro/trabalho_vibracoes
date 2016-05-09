@@ -20,7 +20,8 @@ k_8 = k_7;
 % amortecimentos:
 c_1 = 360; % unidade em N.s/m
 c_3 = c_1;
-c_2 = 120; % unidade em N.s/m
+c_4 = 120; % unidade em N.s/m
+c_6 = c_4;
 % constantes de amortecimento proporcional:
 alpha_proporcional = 0.00001; beta_proporcional = 0.00002;
 %alpha_proporcional = 0; beta_proporcional = 0;
@@ -34,9 +35,8 @@ K(3,1:4) = [-k_4, 0, (k_5 + k_4 + k_7), -k_5];
 K(4,1:4) = [0, -k_6, -k_5, (k_8 + k_6 + k_5)];
 
 % Aplicando amortecimento proporcional para encontrar os outros amortecimentos
-c_4 = alpha_proporcional*M(1,1) + beta_proporcional*K(1,1) - c_1 - c_2;
+c_2 = alpha_proporcional*M(1,1) + beta_proporcional*K(1,1) - c_1 - c_4;
 c_5 = alpha_proporcional*M(3,4) + beta_proporcional*K(3,4);
-c_6 = alpha_proporcional*M(2,2) + beta_proporcional*K(2,2) - c_3 - c_2;
 c_7 = alpha_proporcional*M(3,3) + beta_proporcional*K(3,3) - c_5 - c_4;
 c_8 = alpha_proporcional*M(4,4) + beta_proporcional*K(4,4) - c_6 - c_5;
 
