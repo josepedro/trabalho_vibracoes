@@ -57,30 +57,15 @@ fatores_amortecimento_modais = diag(fatores_amortecimento_modais);
 
 % Construindo a forca de excitacao
 delta_frequencia = 0.1;
-tempo_total_excitacao = 1/delta_frequencia; % unidade em segundos
+tempo_total = 1/delta_frequencia; % unidade em segundos
 frequencia_amostragem = 44100/44; % 44100 amostras por segundo
 frequencias_excitacao = [10:delta_frequencia:250]; % Hz
 delta_tempo = 1/frequencia_amostragem;
-tempos = [0:delta_tempo:tempo_total_excitacao];
-forca_excitacao = 0;
-% Realizando o somatorio das forcas
-for frequencia = 1:length(frequencias_excitacao)
-	forca_excitacao = forca_excitacao + sin(frequencias_excitacao(frequencia)*2*pi*tempos);
-end
-% Plotando a banda de frequencia de excitacao da forca
-magnitude_espectro_excitacao = abs(fft(forca_excitacao));
-magnitude_espectro_excitacao = magnitude_espectro_excitacao/max(magnitude_espectro_excitacao);
-frequencias_ = (0:length(forca_excitacao)-1)*frequencia_amostragem/length(forca_excitacao); 
-figure(1);
-plot(frequencias_, magnitude_espectro_excitacao);
-title('Espectro de Frequencias da Forca de Excitacao','Interpreter','latex','FontSize',16);
-xlabel('Frquencias [Hz]','Interpreter','latex','FontSize',16); 
-ylabel('Amplitude','Interpreter','latex','FontSize',16);
-axis([0 (frequencia_amostragem/2) 0 1.1*max(magnitude_espectro_excitacao)]);
-
+tempos = [0:delta_tempo:tempo_total];
+frequencias_excitacao = (0:length(tempos)-1)*frequencia_amostragem/length(tempos); 
 
 % Construindo resposta em frequencia (H)
-omegas = 2*pi*frequencias_;
+omegas = 2*pi*frequencias_excitacao;
 omegas_quadrado = omegas.^2;
 H(numero_graus_liberdade, numero_graus_liberdade, length(omegas)) = 0;
 for omega = 1:length(omegas)
@@ -105,11 +90,13 @@ for n = 1:length(omegas)
 	H_22_sem_amortecimento(n) = abs(H_sem_amortecimento(2,2,n)); 
 end
 
+
+
 figure;
-semilogy(frequencias_, H_22, 'black');
+semilogy(frequencias_excitacao, H_22, 'black');
 set(findobj(gca,'type','line'), 'LineWidth', 3);
 hold on;
-semilogy(frequencias_, H_22_sem_amortecimento, 'blue');
+semilogy(frequencias_excitacao, H_22_sem_amortecimento, 'blue');
 axis([0 250 0 0.0001])
 
 
@@ -122,9 +109,9 @@ for n = 1:length(omegas)
 end
 
 figure;
-semilogy(frequencias_, H_42, 'black');
+semilogy(frequencias_excitacao, H_42, 'black');
 set(findobj(gca,'type','line'), 'LineWidth', 3);
 hold on;
-semilogy(frequencias_, H_42_sem_amortecimento, 'blue');
+semilogy(frequencias_excitacao, H_42_sem_amortecimento, 'blue');
 axis([0 250 0 0.0001])
 
