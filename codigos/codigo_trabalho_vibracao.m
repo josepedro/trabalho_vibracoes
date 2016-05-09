@@ -85,26 +85,42 @@ local_excitacao = 2;
 H_22(1:length(omegas)) = 0;
 H_22_sem_amortecimento(1:length(omegas)) = 0; 
 for n = 1:length(omegas)
-	H_22(n) = abs(H(local_resposta, local_excitacao, n));
-	H_22_sem_amortecimento(n) = abs(H_sem_amortecimento(2,2,n)); 
+	H_22(n) = (H(local_resposta, local_excitacao, n));
+	H_22_sem_amortecimento(n) = (H_sem_amortecimento(2,2,n)); 
 end
 % Calculando a acelerancia para resposta em 2 e excitação em 2
 A_22 = omegas_quadrado.*H_22;
+A_22(1) = mean(A_22);
 A_22_sem_amortecimento = (omegas.^2).*H_22_sem_amortecimento;
+A_22_sem_amortecimento(1) = mean(A_22_sem_amortecimento);
 
 % Plotando Acelerancia numa Excitacao em 2 e Resposta Captada em 2
 figure(1);
-semilogy(frequencias_excitacao, A_22, 'black');
+subplot(2,1,1);
+semilogy(frequencias_excitacao, abs(A_22), 'black');
 set(findobj(gca,'type','line'), 'LineWidth', 3);
 hold on;
-loglog(frequencias_excitacao, A_22_sem_amortecimento, 'blue');
-axis([10 250 0 max(A_22_sem_amortecimento)]);
+semilogy(frequencias_excitacao, abs(A_22_sem_amortecimento), 'blue');
 title( ... 
-'Magnitude do Espectro de Frequencias da Acelerancia numa Excitacao em 2 e Resposta em 2', ... 
+'Modulo da Acelerancia numa Excitacao em 2 e Resposta em 2', ... 
 'Interpreter','latex','FontSize',16);
-xlabel('Frquencias [Hz]','Interpreter','latex','FontSize',16); 
-ylabel('Amplitude','Interpreter','latex','FontSize',16);
-legend('Acelerancia com Amortecimento','Acelerancia sem Amortecimento');
+xlabel('Frequencias [Hz]','Interpreter','latex','FontSize',16); 
+ylabel('Magnitude','Interpreter','latex','FontSize',16);
+legend('Com Amortecimento','Sem Amortecimento');
+axis([10 250 min(abs(A_22_sem_amortecimento)) 1.1*max(abs(A_22_sem_amortecimento))]);
+%
+subplot(2,1,2);
+plot(frequencias_excitacao, angle(A_22), 'black');
+set(findobj(gca,'type','line'), 'LineWidth', 3);
+hold on;
+plot(frequencias_excitacao, angle(A_22_sem_amortecimento), 'blue');
+title( ... 
+'Fase da Acelerancia numa Excitacao em 2 e Resposta em 2', ... 
+'Interpreter','latex','FontSize',16);
+xlabel('Frequencias [Hz]','Interpreter','latex','FontSize',16); 
+ylabel('Fase','Interpreter','latex','FontSize',16);
+legend('Com Amortecimento','Sem Amortecimento');
+axis([10 250 min(angle(A_22)) 1.1*max(angle(A_22_sem_amortecimento))]);
 
 %--
 % Extraindo a resposta em 4 e excitação em 2
@@ -113,23 +129,38 @@ local_excitacao = 2;
 H_42(1:length(omegas)) = 0;
 H_42_sem_amortecimento(1:length(omegas)) = 0;
 for n = 1:length(omegas)
-	H_42(n) = abs(H(local_resposta, local_excitacao, n));
-	H_42_sem_amortecimento(n) = abs(H_sem_amortecimento(4,2,n));
+	H_42(n) = (H(local_resposta, local_excitacao, n));
+	H_42_sem_amortecimento(n) = (H_sem_amortecimento(4,2,n));
 end
 % Calculando a acelerancia para resposta em 4 e excitação em 2
 A_42 = omegas_quadrado.*H_42;
+A_42(1) = mean(A_22);
 A_42_sem_amortecimento = (omegas.^2).*H_42_sem_amortecimento;
-
+A_22_sem_amortecimento(1) = mean(A_22_sem_amortecimento);
 % Plotando Acelerancia numa Excitacao em 4 e Resposta Captada em 2
 figure(2);
-semilogy(frequencias_excitacao, A_42, 'black');
+subplot(2,1,1);
+semilogy(frequencias_excitacao, abs(A_42), 'black');
 set(findobj(gca,'type','line'), 'LineWidth', 3);
 hold on;
-loglog(frequencias_excitacao, A_42_sem_amortecimento, 'blue');
-axis([10 250 0 max(A_42_sem_amortecimento)]);
+semilogy(frequencias_excitacao, abs(A_42_sem_amortecimento), 'blue');
 title( ... 
-'Magnitude do Espectro de Frequencias da Acelerancia numa Excitacao em 4 e Resposta em 2', ... 
+'Modulo da Acelerancia numa Excitacao em 2 e Resposta em 4', ... 
 'Interpreter','latex','FontSize',16);
-xlabel('Frquencias [Hz]','Interpreter','latex','FontSize',16); 
-ylabel('Amplitude','Interpreter','latex','FontSize',16);
-legend('Acelerancia com Amortecimento','Acelerancia sem Amortecimento');
+xlabel('Frequencias [Hz]','Interpreter','latex','FontSize',16); 
+ylabel('Magnitude','Interpreter','latex','FontSize',16);
+legend('Com Amortecimento','Sem Amortecimento');
+axis([10 250 min(abs(A_42_sem_amortecimento)) 1.1*max(abs(A_42_sem_amortecimento))]);
+%
+subplot(2,1,2);
+plot(frequencias_excitacao, angle(A_42), 'black');
+set(findobj(gca,'type','line'), 'LineWidth', 3);
+hold on;
+plot(frequencias_excitacao, angle(A_42_sem_amortecimento), 'blue');
+title( ... 
+'Fase da Acelerancia numa Excitacao em 2 e Resposta em 4', ... 
+'Interpreter','latex','FontSize',16);
+xlabel('Frequencias [Hz]','Interpreter','latex','FontSize',16); 
+ylabel('Fase','Interpreter','latex','FontSize',16);
+legend('Com Amortecimento','Sem Amortecimento');
+axis([10 250 min(angle(A_42)) 1.1*max(angle(A_42_sem_amortecimento))]);
