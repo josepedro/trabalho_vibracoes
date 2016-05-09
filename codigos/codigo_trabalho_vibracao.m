@@ -134,9 +134,9 @@ for n = 1:length(omegas)
 end
 % Calculando a acelerancia para resposta em 4 e excitação em 2
 A_42 = omegas_quadrado.*H_42;
-A_42(1) = mean(A_22);
+A_42(1) = mean(A_42);
 A_42_sem_amortecimento = (omegas.^2).*H_42_sem_amortecimento;
-A_22_sem_amortecimento(1) = mean(A_22_sem_amortecimento);
+A_42_sem_amortecimento(1) = mean(A_42_sem_amortecimento);
 % Plotando Acelerancia numa Excitacao em 4 e Resposta Captada em 2
 figure(2);
 subplot(2,1,1);
@@ -164,3 +164,46 @@ xlabel('Frequencias [Hz]','Interpreter','latex','FontSize',16);
 ylabel('Fase','Interpreter','latex','FontSize',16);
 legend('Com Amortecimento','Sem Amortecimento');
 axis([10 250 min(angle(A_42)) 1.1*max(angle(A_42_sem_amortecimento))]);
+
+% ---------
+% QUESTAO 5
+frequencia_amostragem = 44100; % amostras por segundo
+delta_tempo = 1/frequencia_amostragem;
+frequencia_fundamental = 20; % unidades em Hz
+periodo = 1/frequencia_fundamental;
+tempos = [0:delta_tempo:periodo];
+excitacao = tempos/(periodo/3);
+menor_aproximado_1_3_periodo = abs(tempos - (periodo/3));
+ponto_descontinuidade = find(menor_aproximado_1_3_periodo ...
+== min(menor_aproximado_1_3_periodo));
+excitacao(ponto_descontinuidade + 1:end) = 0;
+excitacao_periodica = [excitacao excitacao excitacao];
+tempos_total = linspace(0, 3*periodo, length(excitacao_periodica));
+%figure(3);
+%plot(tempos_total, excitacao_periodica);
+% Montando a serie de fourier
+x = linspace(0, 1, ponto_descontinuidade);
+f = x;
+N = 20; % numero de termos
+fs = ones(1,length(x))/2;
+for j = 1:N;
+    fs_p = -1/pi*sin(2*j*pi*x)/j;
+    fs = fs + fs_p;
+end
+excitacao_reconstruida = [fs excitacao(ponto_descontinuidade + 1:end)]; 
+excitacao_reconstruida_periodica = [excitacao_reconstruida ...
+ excitacao_reconstruida excitacao_reconstruida];
+
+figure(6);
+plot(tempos_total, excitacao_periodica,'LineWidth',3);
+hold on
+plot(tempos_total, excitacao_reconstruida_periodica, 'red','LineWidth',1);
+title( ... 
+'Excitacao de Deslocamento de Entrada no Sistema', ... 
+'Interpreter','latex','FontSize',16);
+xlabel('Tempo [s]','Interpreter','latex','FontSize',16); 
+ylabel('Deslocamento','Interpreter','latex','FontSize',16);
+legend('Sinal Original','Serie de Fourier do Sinal com 20 Termos');
+hold off;
+grid on;
+
