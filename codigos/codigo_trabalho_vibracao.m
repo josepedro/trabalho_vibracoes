@@ -68,14 +68,15 @@ for frequencia = 1:length(frequencias_excitacao)
 	forca_excitacao = forca_excitacao + sin(frequencias_excitacao(frequencia)*2*pi*tempos);
 end
 % Plotando a banda de frequencia de excitacao da forca
+magnitude_espectro_excitacao = abs(fft(forca_excitacao));
+magnitude_espectro_excitacao = magnitude_espectro_excitacao/max(magnitude_espectro_excitacao);
 frequencias_ = (0:length(forca_excitacao)-1)*frequencia_amostragem/length(forca_excitacao); 
 figure(1);
-plot(frequencias_, abs(fft(forca_excitacao)));
+plot(frequencias_, magnitude_espectro_excitacao);
 title('Espectro de Frequencias da Forca de Excitacao','Interpreter','latex','FontSize',16);
 xlabel('Frquencias [Hz]','Interpreter','latex','FontSize',16); 
 ylabel('Amplitude','Interpreter','latex','FontSize',16);
-axis([0 (frequencia_amostragem/2) min(abs(fft(forca_excitacao))) ... 
-	max(abs(fft(forca_excitacao)) + 0.1*abs(fft(forca_excitacao)))]);
+axis([0 (frequencia_amostragem/2) 0 1.1*max(magnitude_espectro_excitacao)]);
 
 
 % Construindo resposta em frequencia (H)
