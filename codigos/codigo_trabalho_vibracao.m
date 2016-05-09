@@ -23,7 +23,7 @@ c_3 = c_1;
 c_4 = 120; % unidade em N.s/m
 c_6 = c_4;
 % constantes de amortecimento proporcional:
-alpha_proporcional = 0.00001; beta_proporcional = 0.00002;
+alpha_proporcional = 5; beta_proporcional = 0.00002;
 %alpha_proporcional = 0; beta_proporcional = 0;
 
 % Construindo a matriz de massas
@@ -273,5 +273,3 @@ xlabel('Tempo [s]','Interpreter','latex','FontSize',16);
 ylabel('Deslocamento','Interpreter','latex','FontSize',16);
 hold off;
 grid on;
-
-% plot(abs(ifft(fft(excitacao_reconstruida_periodica).*H_31 )))
