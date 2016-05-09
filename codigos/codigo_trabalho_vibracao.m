@@ -59,7 +59,6 @@ fatores_amortecimento_modais = diag(fatores_amortecimento_modais);
 delta_frequencia = 0.1;
 tempo_total = 1/delta_frequencia; % unidade em segundos
 frequencia_amostragem = 44100/44; % 44100 amostras por segundo
-frequencias_excitacao = [10:delta_frequencia:250]; % Hz
 delta_tempo = 1/frequencia_amostragem;
 tempos = [0:delta_tempo:tempo_total];
 frequencias_excitacao = (0:length(tempos)-1)*frequencia_amostragem/length(tempos); 
@@ -194,16 +193,85 @@ excitacao_reconstruida = [fs excitacao(ponto_descontinuidade + 1:end)];
 excitacao_reconstruida_periodica = [excitacao_reconstruida ...
  excitacao_reconstruida excitacao_reconstruida];
 
+% Construindo resposta em frequencia (H)
+frequencias_excitacao = (0:length(tempos_total)-1)*frequencia_amostragem/length(tempos_total);
+espectro_magnitude_excitacao_entrada = abs(fft(excitacao_reconstruida_periodica));
+%espectro_magnitude_excitacao_entrada = espectro_magnitude_excitacao_entrada/max(espectro_magnitude_excitacao_entrada);
+omegas = 2*pi*frequencias_excitacao;
+omegas_quadrado = omegas.^2;
+H = 0;
+H(numero_graus_liberdade, numero_graus_liberdade, length(omegas)) = 0;
+for omega = 1:length(omegas)
+	H(:,:,omega) = modos_vibracao* ... 
+	(1./(omega_n_quadrado - omegas(omega).^2 + ... 
+		i*2*diag(fatores_amortecimento_modais)*omega_n*omegas(omega)))*modos_vibracao';
+end
+% Extraindo a resposta em 3 e excitação em 1
+local_resposta = 3;
+local_excitacao = 1;
+H_31(1:length(omegas)) = 0;
+for n = 1:length(omegas)
+	H_31(n) = (H(local_resposta, local_excitacao, n));
+end
+H_31(1) = H_31(2);
+
+% Extraindo a resposta em 3 e excitação em 2
+local_resposta = 3;
+local_excitacao = 2;
+H_32(1:length(omegas)) = 0;
+for n = 1:length(omegas)
+	H_32(n) = (H(local_resposta, local_excitacao, n));
+end
+H_32(1) = H_32(2);
+
+% Calculando a resposta final do sinal de saida
+espectro_frequencia_resultante_saida = fft(excitacao_reconstruida_periodica).*H_31 + ...
+fft(excitacao_reconstruida_periodica).*H_32;
+% Retransformando o sinal de saida para o dominio temporal
+sinal_saida_final_deslocamento = real(ifft(espectro_frequencia_resultante_saida));
+
 figure(6);
+subplot(2,1,1);
+plot(frequencias_excitacao, espectro_magnitude_excitacao_entrada);
+axis([0 round(length(frequencias_excitacao)/2) ...
+ min(espectro_magnitude_excitacao_entrada) max(espectro_magnitude_excitacao_entrada)]);
+title( ... 
+'Espectro de Frequencias do Deslocamento de Entrada', ... 
+'Interpreter','latex','FontSize',16);
+xlabel('Frequencias [Hz]','Interpreter','latex','FontSize',16); 
+ylabel('Magnitude','Interpreter','latex','FontSize',16);
+subplot(2,1,2);
+plot(frequencias_excitacao, abs(espectro_frequencia_resultante_saida));
+axis([0 round(length(frequencias_excitacao)/2) min(abs(espectro_frequencia_resultante_saida)) ...
+max(abs(espectro_frequencia_resultante_saida))]);
+title( ... 
+'Espectro de Frequencias do Deslocamento de Saida (Massa 3)', ... 
+'Interpreter','latex','FontSize',16);
+xlabel('Frequencias [Hz]','Interpreter','latex','FontSize',16); 
+ylabel('Magnitude','Interpreter','latex','FontSize',16);
+
+
+figure(7);
+subplot(2,1,1)
 plot(tempos_total, excitacao_periodica,'LineWidth',3);
 hold on
 plot(tempos_total, excitacao_reconstruida_periodica, 'red','LineWidth',1);
 title( ... 
-'Excitacao de Deslocamento de Entrada no Sistema', ... 
+'Excitacao de Deslocamento de Entrada', ... 
 'Interpreter','latex','FontSize',16);
 xlabel('Tempo [s]','Interpreter','latex','FontSize',16); 
 ylabel('Deslocamento','Interpreter','latex','FontSize',16);
 legend('Sinal Original','Serie de Fourier do Sinal com 20 Termos');
 hold off;
 grid on;
+subplot(2,1,2);
+plot(tempos_total, sinal_saida_final_deslocamento);
+title( ... 
+'Excitacao de Deslocamento de Saida (Massa 3)', ... 
+'Interpreter','latex','FontSize',16);
+xlabel('Tempo [s]','Interpreter','latex','FontSize',16); 
+ylabel('Deslocamento','Interpreter','latex','FontSize',16);
+hold off;
+grid on;
 
+% plot(abs(ifft(fft(excitacao_reconstruida_periodica).*H_31 )))
